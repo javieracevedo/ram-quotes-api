@@ -1,0 +1,19 @@
+{
+  "name": "lotr-quotes-api",
+  "version": "0.1.0",
+  "description": "API to get random quotes from characters in the lord of the rings movie and books.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/javieracevedo/lotr-quotes-api.git"
+  },
+  "author": "@javieracevedo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/javieracevedo/lotr-quotes-api/issues"
+  },
+  "homepage": "https://github.com/javieracevedo/lotr-quotes-api#readme"
+}
