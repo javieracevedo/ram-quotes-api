@@ -1,5 +1,5 @@
 import { Quote } from '../quote.model'
-// import mongoose from 'mongoose'
+import mongoose from 'mongoose'
 
 describe('Quote model', () => {
   describe('schema', () => {
@@ -16,10 +16,18 @@ describe('Quote model', () => {
     test('character', () => {
       const character = Quote.schema.obj.character
       expect(character).toEqual({
-        type: String,
-        required: true,
-        trim: true,
-        maxLength: 100
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'character',
+        required: true
+      })
+    })
+
+    test('createdBy', () => {
+      const createdBy = Quote.schema.obj.createdBy
+      expect(createdBy).toEqual({
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'user',
+        required: true
       })
     })
   })
