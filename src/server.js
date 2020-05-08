@@ -2,6 +2,8 @@ import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
 import cors from 'cors'
+import characterRouter from './resources/character/character.router'
+
 // TODO: use config files
 const port = 4000
 
@@ -14,9 +16,11 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.get('/random', (req, res ) => {
-  res.status(200).send({ message: 'Test' })
-})
+app.use('/api/character', characterRouter)
+
+// app.get('/random', (req, res ) => {
+//   res.status(200).send({ message: 'Test' })
+// })
 
 export const start = async () => {
   try {

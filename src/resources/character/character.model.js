@@ -11,7 +11,7 @@ const characterSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'user',
-      required: true
+      required: false
     }
   },
   { timestamps: true }

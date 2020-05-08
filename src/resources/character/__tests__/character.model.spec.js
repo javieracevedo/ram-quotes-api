@@ -18,7 +18,7 @@ describe('Character model', () => {
       expect(createdBy).toEqual({
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'user',
-        required: true
+        required: false
       })
     })
   })

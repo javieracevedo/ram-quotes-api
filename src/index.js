@@ -1,2 +1,11 @@
 import { start } from './server'
-start()
+import mongoose from 'mongoose'
+
+(async () => {
+  await mongoose.connect('mongodb://localhost:27017/ram-api', {
+    useNewUrlParser: true,
+    autoIndex: true
+  })
+
+  start()
+})()

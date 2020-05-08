@@ -9,7 +9,7 @@
     "test-routes": "npm run test -t router",
     "test-models": "npm run test -t model",
     "test-controllers": "npm run test -t controllers",
-    "test-auth": "npm run test -t Authentication:",
+    "test-auth": "npm run test -t auth",
     "dev": "nodemon --exec npm run restart",
     "restart": "rimraf dist && npm run build && npm run start",
     "start": "node dist/index.js"
@@ -25,11 +25,13 @@
   },
   "homepage": "https://github.com/javieracevedo/lotr-quotes-api#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "cuid": "^2.1.8",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongoose": "^5.9.10",
     "morgan": "^1.10.0",
