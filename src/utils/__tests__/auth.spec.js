@@ -1,5 +1,5 @@
-import { newToken, verifyToken, signup, signin } from '../auth'
-// import mongoose from 'mongoose'
+import { newToken, verifyToken, signup, signin, protect } from '../auth'
+import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import config from '../../config'
 import { User } from '../../resources/user/user.model'
@@ -104,7 +104,7 @@ describe('Authentication', () => {
         password: 'yoyo'
       })
 
-      const req = { body: { email: 'hello@me.com', password: 'wrong' }}
+      const req = { body: { email: 'hello@me.com', password: 'wrong' } }
       const res = {
         status(status) {
           expect(status).toBe(401)
@@ -143,6 +143,73 @@ describe('Authentication', () => {
       }
 
       await signin(req, res)
+    })
+  })
+
+  describe('protect', () => {
+    test('looks for Bearer token in headers', async () => {
+      expect.assertions(2)
+
+      const req = { headers: {} }
+      const res = {
+        status(status) {
+          expect(status).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await protect(req, res)
+    })
+
+    test('token must have correct prefix', async () => {
+      expect.assertions(2)
+
+      let req = { headers: { authorization: newToken({ id: '1234' }) }}
+      let res = {
+        status(status) {
+          expect(status).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await protect(req, res)
+    })
+
+    test('must be a real user', async () => {
+      const token = `Bearer ${newToken({ id: mongoose.Types.ObjectId() })}`
+
+      const req = { headers: { authorization: token } }
+      const res = {
+        status(status) {
+          expect(status).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await protect(req, res)
+    })
+
+    test('finds user from token and pass it on', async () => {
+      const user = await User.create({
+        email: 'hello@hello.com',
+        password: '1234'
+      })
+      const token = `Bearer ${newToken(user)}`
+      const req = { headers: { authorization: token } }
+
+      const next = () => {}
+      await protect(req, {}, next)
+      expect(req.user._id.toString()).toBe(user._id.toString())
+      expect(req.user).not.toHaveProperty('password')
     })
   })
 })

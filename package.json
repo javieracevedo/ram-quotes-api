@@ -12,7 +12,7 @@
     "test-auth": "npm run test -t auth",
     "dev": "nodemon --exec npm run restart",
     "restart": "rimraf dist && npm run build && npm run start",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js --inspect"
   },
   "repository": {
     "type": "git",

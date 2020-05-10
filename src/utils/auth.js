@@ -53,7 +53,7 @@ export const signin = async (req, res) => {
     }
 
     const token = newToken(user)
-    return res.status(201).send({ token })
+    return res.status(201).send({ token, data: user })
   } catch (e) {
     console.error(e)
     res.status(500).end()
