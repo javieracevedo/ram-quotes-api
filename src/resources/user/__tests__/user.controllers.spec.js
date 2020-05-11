@@ -1,4 +1,3 @@
-import { newToken } from '../../../utils/auth.js'
 import { updateMe } from '../user.controllers'
 import mongoose from 'mongoose'
 
@@ -24,10 +23,8 @@ describe('user controllers', () => {
 
     test('user with user_id provided must be a real user', async () => {
       const userId = mongoose.Types.ObjectId()
-      const token = `Bearer ${newToken({ id: userId })}`
 
       const req = {
-        headers: { authorization: token },
         params: { user_id: userId }
       }
       const res = {

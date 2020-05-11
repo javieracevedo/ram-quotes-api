@@ -22,13 +22,13 @@ export const updateMe = async (req, res) => {
       .exec()
 
     if (!user) {
-      res.status(404).send({ message: 'User not found.' })
+      res.status(404).send({ message: `User with ${userId} not found.` })
       return
     }
 
     res.status(202).json({ data: user })
   } catch (e) {
     console.log(e)
-    res.status(500).end({ message: e })
+    res.status(5007).end({ message: e })
   }
 }
