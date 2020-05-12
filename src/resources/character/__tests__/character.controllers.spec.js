@@ -1,7 +1,9 @@
 // import { Character } from '../character.model'
 import { User } from '../../user/user.model'
-// import mongoose from 'mongoose'
+import mongoose from 'mongoose'
 import { createOne } from '../character.controllers'
+import { Character } from '../character.model'
+import { signup } from '../../../utils/auth.js'
 
 describe('Character controllers', () => {
   test('creates character', async () => {
@@ -87,12 +89,36 @@ describe('Character controllers', () => {
     await createOne(req, res)
   })
 
-  // test('createdBy', () => {
-  //   const createdBy = Character.schema.obj.createdBy
-  //   expect(createdBy).toEqual({
-  //     type: mongoose.SchemaTypes.ObjectId,
-  //     ref: 'user',
-  //     required: false
-  //   })
-  // })
+  test('provided user must be a real user', async () => {
+    const userId = mongoose.Types.ObjectId()
+
+    const req = { body: { name: 'morty ', createdBy: userId } }
+    const res = {
+      status(status) {
+        expect(status).toBe(404)
+        return this
+      },
+      send(result) {
+        expect(result.message).toBe(`User with id ${userId} doesn't exist.`)
+      }
+    }
+
+    await createOne(req, res)
+  })
+
+  test('character must be new', async () => {
+    // const signupReq = { 
+    //   body: { 
+    //     email: 'j@gmail.com', password: 'test' 
+    //   }
+    // }
+
+    // const user = await signup(, {})
+    await Character.createOne({
+
+    })
+  })
+
+  // character should not exists already (not sure about this one)
+
 })

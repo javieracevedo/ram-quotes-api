@@ -1,4 +1,5 @@
 import { Character } from './character.model'
+import { User } from '../user/user.model'
 import mongoose from 'mongoose'
 
 export const getOne = model => async (req, res) => {
@@ -20,6 +21,7 @@ export const getOne = model => async (req, res) => {
 }
 
 export const createOne = async (req, res) => {
+  // Maybe it's best to get the user from the token rather than the id itself.
   const createdById = req.body.createdBy
   const isValidId = mongoose.Types.ObjectId.isValid(createdById)
 
@@ -36,13 +38,33 @@ export const createOne = async (req, res) => {
     return
   }
 
+  const userIsReal = await userExists(createdById)
+  if (!userIsReal) {
+    res
+      .status(404)
+      .send({ message: `User with id ${createdById} doesn't exist.` })
+    return
+  }
+
   try {
     const doc = await Character.create(req.body)
     res.status(201).json({ data: doc })
   } catch (e) {
-    console.error(e)
-    res.status(400).end()
+    res.status(500).send({ error: e })
   }
+}
+
+// This should be in utils maybe?
+const userExists = async userId => {
+  const user = await User.findById(userId)
+    .lean()
+    .exec()
+
+  if (!user) {
+    return false
+  }
+
+  return true
 }
 
 export default {
