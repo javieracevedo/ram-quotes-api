@@ -23,41 +23,26 @@ export const getOne = model => async (req, res) => {
 }
 
 export const createOne = async (req, res) => {
-  const characterExists = await Character.exists({ name: req.body.name })
+  if (!req.body.name)
+    return res.status(400).send({ message: 'name property is required.' })
 
+  const characterExists = await Character.exists({ name: req.body.name })
   if (characterExists) {
     return res
       .status(403)
       .send({ message: `Character ${req.body.name} already exists.` })
   }
 
-  // Maybe it's best to get the user from the token rather than the id itself.
-  const createdById = req.body.createdBy
-  const isValidId = mongoose.Types.ObjectId.isValid(createdById)
-
-  if (!req.body.name)
-    return res.status(400).send({ message: 'name property is required.' })
-
-  if (!createdById)
-    return res.status(400).send({ message: 'createdBy property is required.' })
-
-  if (!isValidId) {
-    res
-      .status(400)
-      .send({ message: `createdBy id ${createdById} is not valid.` })
-    return
-  }
-
-  const userIsReal = await User.exists({ _id: createdById })
-  if (!userIsReal) {
+  const userExists = await User.exists(req.user)
+  if (!userExists) {
     res
       .status(404)
-      .send({ message: `User with id ${createdById} doesn't exist.` })
+      .send({ message: `User with id ${req.user._id} doesn't exist.` })
     return
   }
 
   try {
-    const doc = await Character.create(req.body)
+    const doc = await Character.create({ ...req.body, createdBy: req.user._id })
     res.status(201).json({ data: doc })
   } catch (e) {
     res.status(500).send({ error: e })
