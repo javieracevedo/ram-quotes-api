@@ -14,8 +14,6 @@ const characterSchema = new mongoose.Schema(
       ref: 'user',
       required: false
     }
-    // TODO: A character needs a quote ref
-
   },
   { timestamps: true }
 )
