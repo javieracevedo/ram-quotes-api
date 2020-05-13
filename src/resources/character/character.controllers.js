@@ -23,9 +23,9 @@ export const getOne = model => async (req, res) => {
 }
 
 export const createOne = async (req, res) => {
-  const characterExists = Character.exists({ name: req.body.name })
+  const characterExists = await Character.exists({ name: req.body.name })
 
-  if (!isEmpty(characterExists)) {
+  if (characterExists) {
     return res
       .status(403)
       .send({ message: `Character ${req.body.name} already exists.` })
@@ -48,7 +48,7 @@ export const createOne = async (req, res) => {
     return
   }
 
-  const userIsReal = await userExists(createdById)
+  const userIsReal = await User.exists({ _id: createdById })
   if (!userIsReal) {
     res
       .status(404)
@@ -62,19 +62,6 @@ export const createOne = async (req, res) => {
   } catch (e) {
     res.status(500).send({ error: e })
   }
-}
-
-// This should be in utils maybe?
-const userExists = async userId => {
-  const user = await User.findById(userId)
-    .lean()
-    .exec()
-
-  if (!user) {
-    return false
-  }
-
-  return true
 }
 
 export default {

@@ -4,7 +4,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 import characterRouter from './resources/character/character.router'
 import userRouter from './resources/user/user.router'
-import { signin, signup } from './utils/auth.js'
+import { signin, signup, protect } from './utils/auth.js'
 
 // TODO: use config files
 const port = 4000
@@ -21,6 +21,7 @@ app.use(morgan('dev'))
 app.post('/signin', signin)
 app.post('/signup', signup)
 
+app.use('/api', protect)
 app.use('/api/character', characterRouter)
 app.use('/api/user', userRouter)
 

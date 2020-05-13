@@ -108,24 +108,26 @@ describe('Character controllers', () => {
     await createOne(req, res)
   })
 
-  // test('character must be new', async () => {
-  //   const userId = mongoose.Types.ObjectId()
-  //   await Character.create({
-  //     name: 'test-char',
-  //     createdBy: userId
-  //   })
+  test('character must be new', async () => {
+    const userId = mongoose.Types.ObjectId()
+    await Character.create({
+      name: 'test-char',
+      createdBy: userId
+    })
 
-  //   const req = { body: { name: 'test-char', createdBy: userId } }
-  //   const res = {
-  //     status(status) {
-  //       expect(status).toBe(403)
-  //       return this
-  //     },
-  //     send(result) {
-  //       expect(result.message).toBe(`Character ${req.body.name} already exists.`)
-  //     }
-  //   }
+    const req = { body: { name: 'test-char', createdBy: userId } }
+    const res = {
+      status(status) {
+        expect(status).toBe(403)
+        return this
+      },
+      send(result) {
+        expect(result.message).toBe(
+          `Character ${req.body.name} already exists.`
+        )
+      }
+    }
 
-  //   await createOne(req, res)
-  // })
+    await createOne(req, res)
+  })
 })
