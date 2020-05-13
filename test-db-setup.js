@@ -2,8 +2,7 @@ import mongoose from 'mongoose'
 import cuid from 'cuid'
 import _ from 'lodash'
 import { Quote } from './src/resources/quote/quote.model'
-// import { Character } from './src/resources/character/character.model'
-
+import { Character } from './src/resources/character/character.model'
 const models = { Quote }
 
 const url = process.env.MONGODB_URI || process.env.DB_URL
@@ -35,9 +34,11 @@ beforeEach(async done => {
         autoIndex: true
       })
       await clearDB()
-
-      // await Character.create({ name: 'test-char',  })
       await Promise.all(Object.keys(models).map(name => models[name].init()))
+      await Character.create({
+        name: 'test-char',
+        createdBy: mongoose.Types.ObjectId()
+      })
     } catch (e) {
       console.log('connection error')
       console.error(e)

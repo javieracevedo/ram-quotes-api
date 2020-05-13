@@ -3,10 +3,12 @@ import { User } from '../../user/user.model'
 import mongoose from 'mongoose'
 import { createOne } from '../character.controllers'
 import { Character } from '../character.model'
-import { signup } from '../../../utils/auth.js'
+// import { clearDB } from '../../../utils/db'
 
 describe('Character controllers', () => {
   test('creates character', async () => {
+    // await clearDB()
+
     expect.assertions(3)
 
     const user = await User.create({
@@ -92,7 +94,7 @@ describe('Character controllers', () => {
   test('provided user must be a real user', async () => {
     const userId = mongoose.Types.ObjectId()
 
-    const req = { body: { name: 'morty ', createdBy: userId } }
+    const req = { body: { name: 'mortyyyy', createdBy: userId } }
     const res = {
       status(status) {
         expect(status).toBe(404)
@@ -106,19 +108,24 @@ describe('Character controllers', () => {
     await createOne(req, res)
   })
 
-  test('character must be new', async () => {
-    // const signupReq = { 
-    //   body: { 
-    //     email: 'j@gmail.com', password: 'test' 
-    //   }
-    // }
+  // test('character must be new', async () => {
+  //   const userId = mongoose.Types.ObjectId()
+  //   await Character.create({
+  //     name: 'test-char',
+  //     createdBy: userId
+  //   })
 
-    // const user = await signup(, {})
-    await Character.createOne({
+  //   const req = { body: { name: 'test-char', createdBy: userId } }
+  //   const res = {
+  //     status(status) {
+  //       expect(status).toBe(403)
+  //       return this
+  //     },
+  //     send(result) {
+  //       expect(result.message).toBe(`Character ${req.body.name} already exists.`)
+  //     }
+  //   }
 
-    })
-  })
-
-  // character should not exists already (not sure about this one)
-
+  //   await createOne(req, res)
+  // })
 })

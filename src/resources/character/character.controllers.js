@@ -1,5 +1,7 @@
 import { Character } from './character.model'
 import { User } from '../user/user.model'
+import { isEmpty } from 'lodash'
+
 import mongoose from 'mongoose'
 
 export const getOne = model => async (req, res) => {
@@ -21,6 +23,14 @@ export const getOne = model => async (req, res) => {
 }
 
 export const createOne = async (req, res) => {
+  const characterExists = Character.exists({ name: req.body.name })
+
+  if (!isEmpty(characterExists)) {
+    return res
+      .status(403)
+      .send({ message: `Character ${req.body.name} already exists.` })
+  }
+
   // Maybe it's best to get the user from the token rather than the id itself.
   const createdById = req.body.createdBy
   const isValidId = mongoose.Types.ObjectId.isValid(createdById)
