@@ -35,10 +35,6 @@ beforeEach(async done => {
       })
       await clearDB()
       await Promise.all(Object.keys(models).map(name => models[name].init()))
-      await Character.create({
-        name: 'test-char',
-        createdBy: mongoose.Types.ObjectId()
-      })
     } catch (e) {
       console.log('connection error')
       console.error(e)

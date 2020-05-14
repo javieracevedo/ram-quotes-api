@@ -1,13 +1,33 @@
 import { Character } from './character.model'
 import { User } from '../user/user.model'
-import { isEmpty } from 'lodash'
-
 import mongoose from 'mongoose'
 
-export const getOne = model => async (req, res) => {
+export const getOne = async (req, res) => {
+  // return res.status(200).send(req.query.a)
+  if (!req.params.id && !req.query.name) {
+    return res.status(400).send({
+      message: 'Either id parameter or name query parameter must be present.'
+    })
+  }
+
+  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
+  if (!isValidId) {
+    return res
+      .status(400)
+      .send({ message: `Character id ${req.params.id} is not a valid id.` })
+  }
+
+  // const characterExists = await Character.exists({ name: req.query.name })
+  // if (req.query.name) {
+  //   if (!characterExists) {
+  //     return res
+  //       .status(404)
+  //       .send(`Character with name ${req.query.name} doesn't exist.`)
+  //   }
+  // }
+
   try {
-    const doc = await model
-      .findOne({ _id: req.params.id })
+    const doc = await Character.findOne({ _id: req.params.id })
       .lean()
       .exec()
 
