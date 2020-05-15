@@ -1,7 +1,12 @@
 // import { Character } from '../character.model'
 import { User } from '../../user/user.model'
-import mongoose, { get } from 'mongoose'
-import { createOne, getOne } from '../character.controllers'
+import mongoose from 'mongoose'
+import {
+  createOne,
+  getOne,
+  deleteOne,
+  updateOne
+} from '../character.controllers'
 import { Character } from '../character.model'
 
 describe('Character controllers', () => {
@@ -133,6 +138,24 @@ describe('Character controllers', () => {
       await getOne(req, res)
     })
 
+    test('character with provided id must be real', async () => {
+      expect.assertions(2)
+
+      const req = { query: {}, params: { id: mongoose.Types.ObjectId() } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with id ${req.params.id} doesn't exist.`
+          )
+        }
+      }
+      await getOne(req, res)
+    })
+
     test('character with query param name must be real', async () => {
       expect.assertions(2)
 
@@ -149,6 +172,110 @@ describe('Character controllers', () => {
         }
       }
       await getOne(req, res)
+    })
+  })
+
+  describe('deleteOne', () => {
+    test('id param must be present', async () => {
+      const req = { params: {} }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe('Character id must be present')
+        }
+      }
+      await deleteOne(req, res)
+    })
+
+    test('id provided must be a valid id', async () => {
+      const req = { params: { id: 'invalid_id' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with id ${req.params.id} is not valid.`
+          )
+        }
+      }
+      await deleteOne(req, res)
+    })
+
+    test('character provided must be real', async () => {
+      expect.assertions(2)
+
+      const fakeCharacterId = mongoose.Types.ObjectId()
+      const req = { params: { id: fakeCharacterId } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with id ${fakeCharacterId} doesn't exist.`
+          )
+        }
+      }
+      await deleteOne(req, res)
+    })
+  })
+
+  describe('updateOne', () => {
+    test('id should be present in params or body', async () => {
+      const req = { params: {}, body: {} }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            'Neither param id or id in body is present in request.'
+          )
+        }
+      }
+      await updateOne(req, res)
+    })
+
+    test('id provided must be a valid id', async () => {
+      const req = { params: { id: 'invalid_id' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with id ${req.params.id} is not valid.`
+          )
+        }
+      }
+      await updateOne(req, res)
+    })
+
+    test('character provided must be real', async () => {
+      expect.assertions(2)
+
+      const fakeCharacterId = mongoose.Types.ObjectId()
+      const req = { params: { id: fakeCharacterId } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with id ${fakeCharacterId} doesn't exist.`
+          )
+        }
+      }
+      await deleteOne(req, res)
     })
   })
 })

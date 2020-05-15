@@ -4,27 +4,32 @@ import mongoose from 'mongoose'
 
 export const getOne = async (req, res) => {
   // return res.status(200).send(req.query.a)
-  if (!req.params.id && !req.query.name) {
+
+  if (req.params.id) {
+    const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
+    if (!isValidId) {
+      return res
+        .status(400)
+        .send({ message: `Character id ${req.params.id} is not a valid id.` })
+    }
+    const characterExists = await Character.exists({ _id: req.params.id })
+    if (!characterExists) {
+      return res.status(404).send({
+        message: `Character with id ${req.params.id} doesn't exist.`
+      })
+    }
+  } else if (req.query.name) {
+    const characterExists = await Character.exists({ name: req.query.name })
+    if (!characterExists) {
+      return res.status(404).send({
+        message: `Character with name ${req.query.name} doesn't exist.`
+      })
+    }
+  } else {
     return res.status(400).send({
       message: 'Either id parameter or name query parameter must be present.'
     })
   }
-
-  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
-  if (!isValidId) {
-    return res
-      .status(400)
-      .send({ message: `Character id ${req.params.id} is not a valid id.` })
-  }
-
-  // const characterExists = await Character.exists({ name: req.query.name })
-  // if (req.query.name) {
-  //   if (!characterExists) {
-  //     return res
-  //       .status(404)
-  //       .send(`Character with name ${req.query.name} doesn't exist.`)
-  //   }
-  // }
 
   try {
     const doc = await Character.findOne({ _id: req.params.id })
@@ -69,7 +74,70 @@ export const createOne = async (req, res) => {
   }
 }
 
+export const deleteOne = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send({ message: 'Character id must be present' })
+  }
+
+  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
+  if (!isValidId) {
+    return res
+      .status(400)
+      .send({ message: `Character with id ${req.params.id} is not valid.` })
+  }
+
+  const characterExists = await Character.exists({ _id: req.params.id })
+  if (!characterExists) {
+    return res
+      .status(404)
+      .send({ message: `Character with id ${req.params.id} doesn't exist.` })
+  }
+
+  try {
+    const doc = await Character.deleteOne({ _id: req.params.id })
+    res.status(201).json({ data: doc })
+  } catch (e) {
+    res.status(500).send({ error: e })
+  }
+}
+
+export const updateOne = async (req, res) => {
+  const characterId = req.params.id ? req.params.id : req.body._id
+  if (!characterId) {
+    return res.status(400).send({
+      message: 'Neither param id or id in body is present in request.'
+    })
+  }
+
+  const isValidId = mongoose.Types.ObjectId.isValid(characterId)
+  if (!isValidId) {
+    return res
+      .status(400)
+      .send({ message: `Character with id ${characterId} is not valid.` })
+  }
+
+  const characterExists = await Character.exists({ _id: characterId })
+  if (!characterExists) {
+    return res
+      .status(400)
+      .send({ message: `Character with id ${characterId} doesn't exist.` })
+  }
+
+  try {
+    const doc = await Character.findOneAndUpdate(
+      { _id: characterId },
+      { ...req.params.body },
+      { new: true }
+    )
+    res.status(201).json({ data: doc })
+  } catch (e) {
+    res.status(500).send({ error: e })
+  }
+}
+
 export default {
   createOne,
-  getOne
+  deleteOne,
+  getOne,
+  updateOne
 }
