@@ -119,18 +119,21 @@ export const updateOne = async (req, res) => {
   const characterExists = await Character.exists({ _id: characterId })
   if (!characterExists) {
     return res
-      .status(400)
+      .status(404)
       .send({ message: `Character with id ${characterId} doesn't exist.` })
   }
 
   try {
-    const doc = await Character.findOneAndUpdate(
-      { _id: characterId },
-      { ...req.params.body },
+    const doc = await Character.findByIdAndUpdate(
+      characterId,
+      { name: req.body.name },
       { new: true }
     )
+      .lean()
+      .exec()
     res.status(201).json({ data: doc })
   } catch (e) {
+    console.log(e)
     res.status(500).send({ error: e })
   }
 }

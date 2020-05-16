@@ -3,10 +3,10 @@ import cuid from 'cuid'
 import _ from 'lodash'
 import { Quote } from './src/resources/quote/quote.model'
 import { Character } from './src/resources/character/character.model'
-const models = { Quote }
 
-const url = process.env.MONGODB_URI || process.env.DB_URL
-console.log(url)
+const models = { Quote, Character }
+
+// const url = process.env.MONGODB_URI || process.env.DB_URL
 
 global.newId = () => {
   return mongoose.Types.ObjectId()

@@ -275,7 +275,38 @@ describe('Character controllers', () => {
           )
         }
       }
-      await deleteOne(req, res)
+      await updateOne(req, res)
+    })
+
+    test('character gets updated properly', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'test@gmail.com',
+        password: '1234'
+      })
+
+      const character = await Character.create({
+        name: 'test',
+        createdBy: user._id
+      })
+
+      const req = {
+        params: { id: character._id },
+        body: { name: 'new_test' },
+        user
+      }
+      const res = {
+        status(status) {
+          expect(status).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.data.name).toBe(req.body.name)
+        }
+      }
+
+      await updateOne(req, res)
     })
   })
 })
