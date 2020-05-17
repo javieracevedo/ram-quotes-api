@@ -1,10 +1,10 @@
-// import { Quote } from './quote.model'
+import { Quote } from './quote.model'
 
-// const getOne = async (req, res) => {
-//   try {
-//     const doc = await Quote
-//       .findOne({ createdBy: })
-//   } catch (error) {
-    
-//   }
-// }
+export const createOne = async (req, res) => {
+  if (!req.body.quote)
+    return res.status(400).send({ message: 'Quote property is required.' })
+}
+
+export default {
+  createOne
+}

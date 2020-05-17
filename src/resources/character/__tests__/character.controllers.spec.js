@@ -11,31 +11,6 @@ import { Character } from '../character.model'
 
 describe('Character controllers', () => {
   describe('createOne', () => {
-    test('creates character', async () => {
-      expect.assertions(2)
-
-      const user = await User.create({
-        email: 'javier@gmail.com',
-        password: '1234'
-      })
-
-      const req = {
-        body: { name: 'summer' },
-        user
-      }
-      const res = {
-        status(status) {
-          expect(status).toBe(201)
-          return this
-        },
-        async json({ data }) {
-          expect(req.body.name).toBe(data.name)
-        }
-      }
-
-      await createOne(req, res)
-    })
-
     test('name property should be present', async () => {
       expect.assertions(2)
 
