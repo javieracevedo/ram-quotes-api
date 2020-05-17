@@ -3,8 +3,6 @@ import { User } from '../user/user.model'
 import mongoose from 'mongoose'
 
 export const getOne = async (req, res) => {
-  // return res.status(200).send(req.query.a)
-
   if (req.params.id) {
     const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
     if (!isValidId) {

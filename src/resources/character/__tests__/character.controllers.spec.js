@@ -44,7 +44,7 @@ describe('Character controllers', () => {
         password: '1234'
       })
 
-      const req = { body: { createdBy: user._id } }
+      const req = { body: {}, user }
       const res = {
         status(status) {
           expect(status).toBe(400)
@@ -82,13 +82,17 @@ describe('Character controllers', () => {
     test('character must be new', async () => {
       expect.assertions(2)
 
-      const userId = mongoose.Types.ObjectId()
-      await Character.create({
-        name: 'test-char',
-        createdBy: userId
+      const user = await User.create({
+        email: 'test@gmail.com',
+        password: '1234'
       })
 
-      const req = { body: { name: 'test-char', createdBy: userId } }
+      await Character.create({
+        name: 'test-char',
+        createdBy: user._id
+      })
+
+      const req = { body: { name: 'test-char' }, user }
       const res = {
         status(status) {
           expect(status).toBe(403)
@@ -98,6 +102,28 @@ describe('Character controllers', () => {
           expect(result.message).toBe(
             `Character ${req.body.name} already exists.`
           )
+        }
+      }
+
+      await createOne(req, res)
+    })
+
+    test('character is created successfully', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'test@gmail.com',
+        password: '1234'
+      })
+
+      const req = { body: { name: 'test-char' }, user }
+      const res = {
+        status(status) {
+          expect(status).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.data.name).toBe(req.body.name)
         }
       }
 
@@ -224,6 +250,28 @@ describe('Character controllers', () => {
       }
       await deleteOne(req, res)
     })
+
+    test('character is deleted sucessfully', async () => {
+      expect.assertions(3)
+
+      const character = await Character.create({
+        name: 'test',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { params: { id: character._id } }
+      const res = {
+        status(status) {
+          expect(status).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.data.deletedCount).toBe(1)
+          expect(result.data.ok).toBe(1)
+        }
+      }
+      await deleteOne(req, res)
+    })
   })
 
   describe('updateOne', () => {
@@ -278,7 +326,7 @@ describe('Character controllers', () => {
       await updateOne(req, res)
     })
 
-    test('character gets updated properly', async () => {
+    test('character is updated properly', async () => {
       expect.assertions(2)
 
       const user = await User.create({
