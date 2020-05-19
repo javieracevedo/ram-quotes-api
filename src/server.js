@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 import characterRouter from './resources/character/character.router'
 import userRouter from './resources/user/user.router'
+import quoteRouter from './resources/quote/quote.router'
 import { signin, signup, protect } from './utils/auth.js'
 
 // TODO: use config files
@@ -24,6 +25,7 @@ app.post('/signup', signup)
 app.use('/api', protect)
 app.use('/api/character', characterRouter)
 app.use('/api/user', userRouter)
+app.use('/api/quote', quoteRouter)
 
 // app.get('/random', (req, res ) => {
 //   res.status(200).send({ message: 'Test' })

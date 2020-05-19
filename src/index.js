@@ -5,7 +5,8 @@ import mongoose from 'mongoose'
   await mongoose.connect('mongodb://localhost:27017/ram-api', {
     useNewUrlParser: true,
     autoIndex: true,
-    poolSize: 10
+    poolSize: 10,
+    useUnifiedTopology: true
   })
 
   start()

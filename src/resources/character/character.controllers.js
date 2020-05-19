@@ -66,6 +66,8 @@ export const createOne = async (req, res) => {
 
   try {
     const doc = await Character.create({ ...req.body, createdBy: req.user._id })
+      .lean()
+      .exec()
     res.status(201).json({ data: doc })
   } catch (e) {
     res.status(500).send({ error: e })
@@ -92,6 +94,7 @@ export const deleteOne = async (req, res) => {
   }
 
   try {
+    // TODO: use findOneAndDelete instead to avoid having to check whether the character exists
     const doc = await Character.deleteOne({ _id: req.params.id })
     res.status(201).json({ data: doc })
   } catch (e) {
