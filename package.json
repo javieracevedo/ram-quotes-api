@@ -67,7 +67,7 @@
     "supertest": "^3.3.0"
   },
   "jest": {
-    "verbose": true,
+    "verbose": false,
     "testURL": "http://localhost/",
     "testEnvironment": "node",
     "setupTestFrameworkScriptFile": "<rootDir>/test-db-setup.js",

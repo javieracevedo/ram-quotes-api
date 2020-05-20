@@ -1,4 +1,4 @@
-import { createOne, getOne } from '../quote.controller'
+import { createOne, getOne, getMany } from '../quote.controller'
 import { User } from '../../user/user.model'
 import mongoose, { mongo } from 'mongoose'
 import { Character } from '../../character/character.model'
@@ -157,6 +157,8 @@ describe('Quote controllers', () => {
     })
 
     test('gets quote successfully', async () => {
+      expect.assertions(2)
+
       const quote = await Quote.create({
         quote: 'Wabba labba dubb dubb',
         character: mongoose.Types.ObjectId(),
@@ -177,20 +179,56 @@ describe('Quote controllers', () => {
     })
   })
 
-  // describe('quote get many', () => {
-  //   // test('character with name provided must exist.', () => {
+  describe('quote get many', () => {
+    test('character name provided must exist.', async () => {
+      const req = { query: { character_name: 'some-char' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with name ${req.query.name} was not found.`
+          )
+        }
+      }
 
-  //   })
-  //   test('quotes are found by name successfully', () => {
-      
-  //   })
-  //   test('quotes are found successfully', () => {
-      
-  //   })
-  //   test('quotes are not found', () => {
-      
-  //   })
+      await getMany(req, res)
+    })
+    test('quotes are found by character name successfully', async () => {
+      const character = await Character.create({
+        name: 'Rick',
+        createdBy: mongoose.Types.ObjectId()
+      })
 
-  //   //  TODO: add support for limit query param.
-  // })
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { query: { character_name: 'Rick' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(Array.isArray(result.data)).toBe(true)
+        }
+      }
+
+      await getMany(req, res)
+    })
+
+    // test('quotes are found successfully', () => {
+      
+    // })
+    // test('quotes are not found', () => {
+      
+    // })
+
+    //  TODO: add support for limit query param.
+  })
 })

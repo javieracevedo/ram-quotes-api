@@ -60,8 +60,34 @@ export const getOne = async (req, res) => {
   }
 }
 
+// TODO: Should be the only one, always by id and use limit to get the amount you need
 export const getMany = async (req, res) => {
-  return res.status(200).send({ message: 'ok' })
+  if (req.query.character_name) {
+    const characterExist = await Character.exists({
+      name: req.query.character_name
+    })
+
+    if (!characterExist) {
+      return res.status(404).send({
+        message: `Character with name ${req.query.character_name} was not found.`
+      })
+    }
+  }
+
+  try {
+    const character = await Character.findOne({
+      name: req.query.character_name
+    })
+
+    const doc = await Quote.find({ character: character._id })
+      .limit(25)
+      .lean()
+      .exec()
+    return res.status(200).send({ data: doc })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).send({ message: e })
+  }
 }
 
 // export const updateOne = async (req, res) => {
@@ -69,5 +95,6 @@ export const getMany = async (req, res) => {
 // }
 
 export default {
-  createOne
+  createOne,
+  getMany
 }

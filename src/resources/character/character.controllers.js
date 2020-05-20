@@ -66,8 +66,6 @@ export const createOne = async (req, res) => {
 
   try {
     const doc = await Character.create({ ...req.body, createdBy: req.user._id })
-      .lean()
-      .exec()
     res.status(201).json({ data: doc })
   } catch (e) {
     res.status(500).send({ error: e })
