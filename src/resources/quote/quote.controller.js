@@ -61,29 +61,24 @@ export const getOne = async (req, res) => {
 }
 
 // TODO: Should be the only one, always by id and use limit to get the amount you need
+// TODO: should be public
 export const getMany = async (req, res) => {
-  if (req.query.character_name) {
-    const characterExist = await Character.exists({
-      name: req.query.character_name
+  const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
+  if (req.query.character_id && !isValidId) {
+    return res.status(400).send({
+      message: `Character id ${req.query.character_id} is not valid.`
     })
-
-    if (!characterExist) {
-      return res.status(404).send({
-        message: `Character with name ${req.query.character_name} was not found.`
-      })
-    }
   }
 
   try {
-    const character = await Character.findOne({
-      name: req.query.character_name
-    })
+    const limit = Number(req.query.limit) || 25
+    const query = req.query.character_id ? { character: req.character_id } : {}
 
-    const doc = await Quote.find({ character: character._id })
-      .limit(25)
+    const doc = await Quote.find(query)
+      .limit(limit)
       .lean()
       .exec()
-    return res.status(200).send({ data: doc })
+    return res.status(200).json({ data: doc })
   } catch (e) {
     console.log(e)
     return res.status(500).send({ message: e })

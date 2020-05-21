@@ -180,23 +180,27 @@ describe('Quote controllers', () => {
   })
 
   describe('quote get many', () => {
-    test('character name provided must exist.', async () => {
-      const req = { query: { character_name: 'some-char' } }
+    test('character id provided must be a valid id.', async () => {
+      const req = {
+        query: { character_id: 'bbleh', limit: 5 }
+      }
       const res = {
         status(status) {
-          expect(status).toBe(404)
+          expect(status).toBe(400)
           return this
         },
         send(result) {
           expect(result.message).toBe(
-            `Character with name ${req.query.name} was not found.`
+            `Character id ${req.query.character_id} is not valid.`
           )
         }
       }
 
       await getMany(req, res)
     })
-    test('quotes are found by character name successfully', async () => {
+    test('quotes are found by character id successfully', async () => {
+      expect.assertions(2)
+
       const character = await Character.create({
         name: 'Rick',
         createdBy: mongoose.Types.ObjectId()
@@ -208,7 +212,7 @@ describe('Quote controllers', () => {
         createdBy: mongoose.Types.ObjectId()
       })
 
-      const req = { query: { character_name: 'Rick' } }
+      const req = { query: { character_id: character._id, limit: 5 } }
       const res = {
         status(status) {
           expect(status).toBe(200)
@@ -222,13 +226,73 @@ describe('Quote controllers', () => {
       await getMany(req, res)
     })
 
-    // test('quotes are found successfully', () => {
-      
-    // })
-    // test('quotes are not found', () => {
-      
-    // })
+    test('quotes are found successfully', async () => {
+      expect.assertions(2)
 
+      const character = await Character.create({
+        name: 'Rick',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { query: { limit: 5 } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(Array.isArray(result.data)).toBe(true)
+        }
+      }
+
+      await getMany(req, res)
+    })
+
+    test('amount of quotes returned match limit', async () => {
+      expect.assertions(2)
+
+      const character = await Character.create({
+        name: 'Rick',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { query: { limit: 2 } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data.length).toBe(2)
+        }
+      }
+
+      await getMany(req, res)
+    })
     //  TODO: add support for limit query param.
   })
 })
