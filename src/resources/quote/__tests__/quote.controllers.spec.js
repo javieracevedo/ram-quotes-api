@@ -1,4 +1,4 @@
-import { createOne, getOne, getMany } from '../quote.controller'
+import { createOne, getOne, getMany, updateOne } from '../quote.controller'
 import { User } from '../../user/user.model'
 import mongoose, { mongo } from 'mongoose'
 import { Character } from '../../character/character.model'
@@ -294,5 +294,92 @@ describe('Quote controllers', () => {
       await getMany(req, res)
     })
     //  TODO: add support for limit query param.
+  })
+
+  describe('quote update', () => {
+    test('quote id param must be present', async () => {
+      const req = { params: {} }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe('Quote id param is required.')
+        }
+      }
+
+      await updateOne(req, res)
+    })
+    test('quote id must be valid', async () => {
+      const invalidQuoteId = 'blehbluh'
+      const req = {
+        params: { id: invalidQuoteId }
+      }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Quote provided with id ${invalidQuoteId} is not valid.`
+          )
+        }
+      }
+
+      await updateOne(req, res)
+    })
+    test('quote is updated successfully', async () => {
+      expect.assertions(3)
+      const quote = await Quote.create({
+        quote: 'this is a quote',
+        character: mongoose.Types.ObjectId(),
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = {
+        params: { id: quote._id },
+        body: {
+          quote: 'this is another quote.',
+          character: mongoose.Types.ObjectId()
+        }
+      }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data.quote).toBe(req.body.quote)
+          expect(result.data.character).toEqual(req.body.character)
+        }
+      }
+      await updateOne(req, res)
+    })
+
+    test('quote id provided must be real.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        params: { id: mongoose.Types.ObjectId() },
+        body: {
+          quote: 'new quote value',
+          character: mongoose.Types.ObjectId()
+        }
+      }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Quote with id ${req.params.id} was not found.`
+          )
+        }
+      }
+      await updateOne(req, res)
+    })
   })
 })

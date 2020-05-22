@@ -55,13 +55,10 @@ export const getOne = async (req, res) => {
     }
     return res.status(201).json({ data: doc })
   } catch (e) {
-    console.log('ERROR: ', e)
     return res.status(500).send({ error: e })
   }
 }
 
-// TODO: Should be the only one, always by id and use limit to get the amount you need
-// TODO: should be public
 export const getMany = async (req, res) => {
   const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
   if (req.query.character_id && !isValidId) {
@@ -85,9 +82,39 @@ export const getMany = async (req, res) => {
   }
 }
 
-// export const updateOne = async (req, res) => {
+export const updateOne = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send({ message: 'Quote id param is required.' })
+  }
 
-// }
+  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
+  if (!isValidId) {
+    return res.status(400).send({
+      message: `Quote provided with id ${req.params.id} is not valid.`
+    })
+  }
+
+  try {
+    const doc = await Quote.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true }
+    )
+      .lean()
+      .exec()
+
+    if (!doc) {
+      return res
+        .status(404)
+        .send({ message: `Quote with id ${req.params.id} was not found.` })
+    }
+
+    return res.status(200).json({ data: doc })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).send({ message: e })
+  }
+}
 
 export default {
   createOne,

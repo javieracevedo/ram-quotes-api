@@ -27,7 +27,8 @@ describe('Quote model', () => {
       expect(createdBy).toEqual({
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'user',
-        required: true
+        required: true,
+        inmutable: true
       })
     })
   })

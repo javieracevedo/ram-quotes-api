@@ -16,7 +16,8 @@ const quoteSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'user',
-      required: true
+      required: true,
+      inmutable: true
     }
   },
   { timestamps: true }
