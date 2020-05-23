@@ -116,7 +116,35 @@ export const updateOne = async (req, res) => {
   }
 }
 
+export const deleteOne = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).send({ message: 'Quote id param is required.' })
+  }
+
+  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
+  if (!isValidId) {
+    return res
+      .status(400)
+      .send({ message: `Quote with id ${req.params.id} is invalid.` })
+  }
+
+  const quoteExist = await Quote.exists({ _id: req.params.id })
+  if (!quoteExist) {
+    return res
+      .status(404)
+      .send({ message: `Quote with id ${req.params.id} does not exist.` })
+  }
+
+  try {
+    const doc = await Quote.deleteOne({ _id: req.params.id })
+    return res.status(200).json({ data: doc })
+  } catch (e) {
+    return res.status(500).send({ message: e })
+  }
+}
+
 export default {
   createOne,
-  getMany
+  getMany,
+  deleteOne
 }

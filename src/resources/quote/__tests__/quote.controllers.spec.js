@@ -1,6 +1,12 @@
-import { createOne, getOne, getMany, updateOne } from '../quote.controller'
+import {
+  createOne,
+  getOne,
+  getMany,
+  updateOne,
+  deleteOne
+} from '../quote.controller'
 import { User } from '../../user/user.model'
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 import { Character } from '../../character/character.model'
 import { Quote } from '../quote.model'
 
@@ -380,6 +386,77 @@ describe('Quote controllers', () => {
         }
       }
       await updateOne(req, res)
+    })
+  })
+
+  describe('quote delete', () => {
+    test('quote id must be present', async () => {
+      const req = { params: {} }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(`Quote id param is required.`)
+        }
+      }
+      await deleteOne(req, res)
+    })
+
+    test('quote id must be valid', async () => {
+      const req = { params: { id: 'invalidId' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Quote with id ${req.params.id} is invalid.`
+          )
+        }
+      }
+      await deleteOne(req, res)
+    })
+
+    test('quote with id param provided must exist.', async () => {
+      const req = { params: { id: mongoose.Types.ObjectId() } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Quote with id ${req.params.id} does not exist.`
+          )
+        }
+      }
+      await deleteOne(req, res)
+    })
+
+    test('quote is deleted sucessfully', async () => {
+      expect.assertions(3)
+
+      const quote = await Quote.create({
+        quote: 'this is a nice quote',
+        character: mongoose.Types.ObjectId(),
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { params: { id: quote._id } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data.deletedCount).toBe(1)
+          expect(result.data.ok).toBe(1)
+        }
+      }
+      await deleteOne(req, res)
     })
   })
 })
