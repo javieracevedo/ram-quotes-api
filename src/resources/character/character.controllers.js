@@ -45,6 +45,16 @@ export const getOne = async (req, res) => {
   }
 }
 
+// TODO: add getMany characters
+export const getMany = async (req, res) => {
+  try {
+    const doc = await Character.find({})
+    return res.status(200).json({ data: doc })
+  } catch (e) {
+    return res.status(500).send({ message: e })
+  }
+}
+
 export const createOne = async (req, res) => {
   if (!req.body.name)
     return res.status(400).send({ message: 'name property is required.' })
@@ -133,6 +143,11 @@ export const updateOne = async (req, res) => {
     res.status(201).json({ data: doc })
   } catch (e) {
     console.log(e)
+    if (e.codeName === 'DuplicateKey') {
+      res.status(403).send({
+        message: `Character with name ${req.body.name} already exists.`
+      })
+    }
     res.status(500).send({ error: e })
   }
 }
@@ -141,5 +156,6 @@ export default {
   createOne,
   deleteOne,
   getOne,
+  getMany,
   updateOne
 }

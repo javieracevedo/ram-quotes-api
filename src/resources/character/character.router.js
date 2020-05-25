@@ -6,7 +6,7 @@ const router = Router()
 router.route('/').post(controllers.createOne)
 
 router.route('/:id').get(controllers.getOne)
-router.route('/').get(controllers.getOne)
+router.route('/').get(controllers.getMany)
 
 router.route('/:id').put(controllers.updateOne)
 router.route('/').put(controllers.updateOne)

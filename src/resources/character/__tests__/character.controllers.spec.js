@@ -1,11 +1,11 @@
-// import { Character } from '../character.model'
 import { User } from '../../user/user.model'
 import mongoose from 'mongoose'
 import {
   createOne,
   getOne,
   deleteOne,
-  updateOne
+  updateOne,
+  getMany
 } from '../character.controllers'
 import { Character } from '../character.model'
 
@@ -176,6 +176,37 @@ describe('Character controllers', () => {
     })
   })
 
+  describe('getMany', () => {
+    test('gets many characters', async () => {
+      expect.assertions(2)
+
+      // eslint-disable-next-line no-unused-vars
+      const rick = await Character.create({
+        name: 'Rick',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      // eslint-disable-next-line no-unused-vars
+      const summer = await Character.create({
+        name: 'Summer',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = {}
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data).toHaveLength(2)
+        }
+      }
+
+      await getMany(req, res)
+    })
+  })
+
   describe('deleteOne', () => {
     test('id param must be present', async () => {
       const req = { params: {} }
@@ -326,6 +357,45 @@ describe('Character controllers', () => {
         },
         json(result) {
           expect(result.data.name).toBe(req.body.name)
+        }
+      }
+
+      await updateOne(req, res)
+    })
+
+    test('character name must be unique', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'test@gmail.com',
+        password: '1234'
+      })
+
+      const dummyCharacter = await Character.create({
+        name: 'dummy',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const dummyCharacterTwo = await Character.create({
+        name: 'another dummy',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = {
+        body: { ...dummyCharacterTwo },
+        params: { id: dummyCharacter._id },
+        user
+      }
+      console.log(dummyCharacterTwo._id)
+      const res = {
+        status(status) {
+          expect(status).toBe(403)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Character with name ${req.body.name} already exists.`
+          )
         }
       }
 

@@ -23,9 +23,9 @@ app.post('/signin', signin)
 app.post('/signup', signup)
 
 app.use('/api', protect)
-app.use('/api/character', characterRouter)
-app.use('/api/user', userRouter)
-app.use('/api/quote', quoteRouter)
+app.use('/api/characters', characterRouter)
+app.use('/api/users', userRouter)
+app.use('/api/quotes', quoteRouter)
 
 // app.get('/random', (req, res ) => {
 //   res.status(200).send({ message: 'Test' })

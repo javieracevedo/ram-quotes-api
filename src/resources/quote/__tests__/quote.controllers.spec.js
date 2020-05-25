@@ -204,6 +204,25 @@ describe('Quote controllers', () => {
 
       await getMany(req, res)
     })
+
+    test('character name provided must be a real.', async () => {
+      const req = {
+        query: { character_name: 'fake_name' }
+      }
+
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await getMany(req, res)
+    })
+
     test('quotes are found by character id successfully', async () => {
       expect.assertions(2)
 
@@ -225,7 +244,7 @@ describe('Quote controllers', () => {
           return this
         },
         json(result) {
-          expect(Array.isArray(result.data)).toBe(true)
+          expect(result.data).toHaveLength(1)
         }
       }
 

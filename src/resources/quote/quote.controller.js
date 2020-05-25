@@ -32,6 +32,7 @@ export const createOne = async (req, res) => {
 }
 
 // TODO: should be public
+// TODO: add support for character name query param.
 export const getOne = async (req, res) => {
   if (!req.params.id)
     return res.status(400).send({ message: 'Quote id param is required.' })
@@ -59,6 +60,7 @@ export const getOne = async (req, res) => {
   }
 }
 
+// TODO: add support for character name query param.
 export const getMany = async (req, res) => {
   const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
   if (req.query.character_id && !isValidId) {
@@ -69,12 +71,40 @@ export const getMany = async (req, res) => {
 
   try {
     const limit = Number(req.query.limit) || 25
-    const query = req.query.character_id ? { character: req.character_id } : {}
 
-    const doc = await Quote.find(query)
+    let query = {}
+    let characterQuery = {}
+    let character
+    if (req.query.character_id) {
+      query = { character: req.query.character_id }
+      characterQuery = { _id: req.query.character_id }
+    } else if (req.query.character_name) {
+      characterQuery = { name: req.query.character_name }
+    }
+
+    if (characterQuery.character_id || characterQuery.character_name) {
+      character = await Character.findOne(characterQuery)
+      if (!character) {
+        return res.status(404).send({
+          message: `Character with name or id ${req.query.character_name ||
+            req.query.character_id} was not found.`
+        })
+      } else {
+        query = { character: character._id }
+        console.log(query)
+      }
+    }
+
+    console.log(limit)
+    let doc = await Quote.find(query)
       .limit(limit)
       .lean()
       .exec()
+    // console.log(query)
+    doc = doc.map(quote => {
+      return { ...quote, character }
+    })
+
     return res.status(200).json({ data: doc })
   } catch (e) {
     console.log(e)
@@ -146,5 +176,6 @@ export const deleteOne = async (req, res) => {
 export default {
   createOne,
   getMany,
+  getOne,
   deleteOne
 }
