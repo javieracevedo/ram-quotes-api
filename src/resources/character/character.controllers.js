@@ -142,7 +142,6 @@ export const updateOne = async (req, res) => {
       .exec()
     res.status(201).json({ data: doc })
   } catch (e) {
-    console.log(e)
     if (e.codeName === 'DuplicateKey') {
       res.status(403).send({
         message: `Character with name ${req.body.name} already exists.`

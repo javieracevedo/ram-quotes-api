@@ -251,6 +251,34 @@ describe('Quote controllers', () => {
       await getMany(req, res)
     })
 
+    test('Quotes are found by character name successfully', async () => {
+      expect.assertions(2)
+
+      const character = await Character.create({
+        name: 'javier',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      await Quote.create({
+        quote: 'Some quote.',
+        character: character._id,
+        createdBy: character._id
+      })
+
+      const req = { query: { character_name: character.name } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          const firstQuote = result.data[0]
+          expect(firstQuote.character.name).toBe(character.name)
+        }
+      }
+      await getMany(req, res)
+    })
+
     test('quotes are found successfully', async () => {
       expect.assertions(2)
 

@@ -75,6 +75,7 @@ export const getMany = async (req, res) => {
     let query = {}
     let characterQuery = {}
     let character
+
     if (req.query.character_id) {
       query = { character: req.query.character_id }
       characterQuery = { _id: req.query.character_id }
@@ -82,7 +83,7 @@ export const getMany = async (req, res) => {
       characterQuery = { name: req.query.character_name }
     }
 
-    if (characterQuery.character_id || characterQuery.character_name) {
+    if (characterQuery._id || characterQuery.name) {
       character = await Character.findOne(characterQuery)
       if (!character) {
         return res.status(404).send({
@@ -91,23 +92,19 @@ export const getMany = async (req, res) => {
         })
       } else {
         query = { character: character._id }
-        console.log(query)
       }
     }
 
-    console.log(limit)
     let doc = await Quote.find(query)
       .limit(limit)
       .lean()
       .exec()
-    // console.log(query)
     doc = doc.map(quote => {
       return { ...quote, character }
     })
 
     return res.status(200).json({ data: doc })
   } catch (e) {
-    console.log(e)
     return res.status(500).send({ message: e })
   }
 }
@@ -141,7 +138,6 @@ export const updateOne = async (req, res) => {
 
     return res.status(200).json({ data: doc })
   } catch (e) {
-    console.log(e)
     return res.status(500).send({ message: e })
   }
 }

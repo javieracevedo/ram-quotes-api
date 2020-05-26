@@ -28,7 +28,6 @@ export const updateMe = async (req, res) => {
 
     res.status(202).json({ data: user })
   } catch (e) {
-    console.log(e)
     res.status(5007).end({ message: e })
   }
 }
