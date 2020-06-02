@@ -3,6 +3,7 @@ import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
 import cors from 'cors'
 import characterRouter from './resources/character/character.router'
+import characterPublicRouter from './resources/character/character.router.public'
 import userRouter from './resources/user/user.router'
 import quoteRouter from './resources/quote/quote.router'
 import quotePublicRouter from './resources/quote/quote.router.public'
@@ -24,6 +25,7 @@ app.post('/signin', signin)
 app.post('/signup', signup)
 
 app.use('/public/quotes', quotePublicRouter)
+app.use('/public/characters', characterPublicRouter)
 
 app.use('/', protect)
 app.use('/characters', characterRouter)
