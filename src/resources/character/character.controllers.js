@@ -48,7 +48,10 @@ export const getOne = async (req, res) => {
 // TODO: add getMany characters
 export const getMany = async (req, res) => {
   try {
-    const doc = await Character.find({})
+    let doc = await Character.find({})
+    doc = doc.map(record => {
+      return { _id: record._id, name: record.name }
+    })
     return res.status(200).json({ data: doc })
   } catch (e) {
     return res.status(500).send({ message: e })
