@@ -115,23 +115,8 @@ describe('Quote controllers', () => {
   })
 
   describe('quote get one', () => {
-    test('id param must be present', async () => {
-      const req = { params: {} }
-      const res = {
-        status(status) {
-          expect(status).toBe(400)
-          return this
-        },
-        send(result) {
-          expect(result.message).toBe('Quote id param is required.')
-        }
-      }
-
-      await getOne(req, res)
-    })
-
     test('id param must be a valid id', async () => {
-      const req = { params: { id: '123' } }
+      const req = { query: { character_id: '123' } }
       const res = {
         status(status) {
           expect(status).toBe(400)
@@ -139,15 +124,15 @@ describe('Quote controllers', () => {
         },
         send(result) {
           expect(result.message).toBe(
-            `Quote with id ${req.params.id} is not valid.`
+            `Character id ${req.query.character_id} is not valid.`
           )
         }
       }
       await getOne(req, res)
     })
 
-    test('quote does not exists', async () => {
-      const req = { params: { id: mongoose.Types.ObjectId() } }
+    test('quote with character id does not exists', async () => {
+      const req = { query: { character_id: mongoose.Types.ObjectId() } }
       const res = {
         status(status) {
           expect(status).toBe(404)
@@ -155,30 +140,80 @@ describe('Quote controllers', () => {
         },
         send(result) {
           expect(result.message).toBe(
-            `Quote with id ${req.params.id} does not exist.`
+            `Quote with character id ${req.query.character_id} does not exist.`
           )
         }
       }
       await getOne(req, res)
     })
 
-    test('gets quote successfully', async () => {
+    test('quote with character name does not exists', async () => {
+      const req = { query: { character_name: 'fake-name' } }
+      const res = {
+        status(status) {
+          expect(status).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result.message).toBe(
+            `Quote with character name ${req.query.character_name} does not exist.`
+          )
+        }
+      }
+      await getOne(req, res)
+    })
+
+    test('gets quote by character id successfully', async () => {
       expect.assertions(2)
 
-      const quote = await Quote.create({
-        quote: 'Wabba labba dubb dubb',
-        character: mongoose.Types.ObjectId(),
+      const character = await Character.create({
+        name: 'Rick',
         createdBy: mongoose.Types.ObjectId()
       })
 
-      const req = { params: { id: quote._id } }
+      const quote = await Quote.create({
+        quote: 'Wabba labba dubb dubb',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { query: { character_id: quote.character } }
       const res = {
         status(status) {
-          expect(status).toBe(201)
+          expect(status).toBe(200)
           return this
         },
         json(result) {
-          expect(result.data._id).toEqual(quote._id)
+          expect(result.data.character).toEqual(quote.character)
+        }
+      }
+      await getOne(req, res)
+    })
+
+    test('gets quote by character name successfully', async () => {
+      expect.assertions(3)
+
+
+      const character = await Character.create({
+        name: 'Rick',
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const quote = await Quote.create({
+        quote: 'Wabba labba dubb dubb',
+        character: character._id,
+        createdBy: mongoose.Types.ObjectId()
+      })
+
+      const req = { query: { character_name: character.name } }
+      const res = {
+        status(status) {
+          expect(status).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data.character).toEqual(character._id)
+          expect(result.data.quote).toEqual(quote.quote)
         }
       }
       await getOne(req, res)

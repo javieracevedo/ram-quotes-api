@@ -31,36 +31,60 @@ export const createOne = async (req, res) => {
   }
 }
 
-// TODO: should be public
 // TODO: add support for character name query param.
 export const getOne = async (req, res) => {
-  if (!req.params.id)
-    return res.status(400).send({ message: 'Quote id param is required.' })
-
-  // TODO: make this in to a middleware maybe?
-  const isValidId = mongoose.Types.ObjectId.isValid(req.params.id)
-  if (!isValidId) {
-    return res
-      .status(400)
-      .send({ message: `Quote with id ${req.params.id} is not valid.` })
+  const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
+  if (req.query.character_id && !isValidId) {
+    return res.status(400).send({
+      message: `Character id ${req.query.character_id} is not valid.`
+    })
   }
 
   try {
-    const doc = await Quote.findById(req.params.id)
+    let query = {}
+    let characterQuery = {}
+    let character
+
+    if (req.query.character_id) {
+      query = { character: req.query.character_id }
+      characterQuery = { _id: req.query.character_id }
+    } else if (req.query.character_name) {
+      characterQuery = { name: req.query.character_name }
+    }
+
+    if (characterQuery._id || characterQuery.name) {
+      character = await Character.findOne(characterQuery)
+      if (!character) {
+        const message = req.query.character_id
+          ? `Quote with character id ${req.query.character_id} does not exist.`
+          : `Quote with character name ${req.query.character_name} does not exist.`
+
+        return res.status(404).send({ message })
+      } else {
+        query = { character: character._id }
+      }
+    }
+
+    const count = await Quote.count(query)
+    const random = Math.floor(Math.random() * count)
+    let doc = await Quote.findOne(query)
+      .skip(random)
       .lean()
       .exec()
-    if (!doc) {
-      return res
-        .status(404)
-        .send({ message: `Quote with id ${req.params.id} does not exist.` })
+
+    if (!character) {
+      return res.status(200).json({ data: doc })
     }
-    return res.status(201).json({ data: doc })
+
+    return res
+      .status(200)
+      .json({ data: { ...doc, character_name: character.name } })
   } catch (e) {
-    return res.status(500).send({ error: e })
+    console.log(e)
+    return res.status(500).send({ message: e })
   }
 }
 
-// TODO: add support for character name query param.
 export const getMany = async (req, res) => {
   const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
   if (req.query.character_id && !isValidId) {
@@ -175,3 +199,9 @@ export default {
   getOne,
   deleteOne
 }
+
+// TODO
+// Add middleware that filters unwanted props: since it's just one controller filter it there
+// Separate private controller from public ones by using a router for each 
+// Remove get many controller
+// Add API documentation to github

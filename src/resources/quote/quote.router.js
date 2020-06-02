@@ -4,9 +4,6 @@ import quoteController from './quote.controller'
 const router = Router()
 
 router.post('/', quoteController.createOne)
-router.get('/', quoteController.getMany)
-router.get('/:id', quoteController.getOne)
-
 router.delete('/:id', quoteController.deleteOne)
 
 export default router

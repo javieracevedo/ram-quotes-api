@@ -5,6 +5,7 @@ import cors from 'cors'
 import characterRouter from './resources/character/character.router'
 import userRouter from './resources/user/user.router'
 import quoteRouter from './resources/quote/quote.router'
+import quotePublicRouter from './resources/quote/quote.router.public'
 import { signin, signup, protect } from './utils/auth.js'
 
 // TODO: use config files
@@ -22,14 +23,12 @@ app.use(morgan('dev'))
 app.post('/signin', signin)
 app.post('/signup', signup)
 
-app.use('/api', protect)
-app.use('/api/characters', characterRouter)
-app.use('/api/users', userRouter)
-app.use('/api/quotes', quoteRouter)
+app.use('/public/quotes', quotePublicRouter)
 
-// app.get('/random', (req, res ) => {
-//   res.status(200).send({ message: 'Test' })
-// })
+app.use('/', protect)
+app.use('/characters', characterRouter)
+app.use('/users', userRouter)
+app.use('/quotes', quoteRouter)
 
 export const start = async () => {
   try {
