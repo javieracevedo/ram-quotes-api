@@ -1,10 +1,4 @@
-import {
-  createOne,
-  getOne,
-  getMany,
-  updateOne,
-  deleteOne
-} from '../quote.controller'
+import { createOne, getOne, updateOne, deleteOne } from '../quote.controller'
 import { User } from '../../user/user.model'
 import mongoose from 'mongoose'
 import { Character } from '../../character/character.model'
@@ -220,169 +214,169 @@ describe('Quote controllers', () => {
     })
   })
 
-  describe('quote get many', () => {
-    test('character id provided must be a valid id.', async () => {
-      const req = {
-        query: { character_id: 'bbleh', limit: 5 }
-      }
-      const res = {
-        status(status) {
-          expect(status).toBe(400)
-          return this
-        },
-        send(result) {
-          expect(result.message).toBe(
-            `Character id ${req.query.character_id} is not valid.`
-          )
-        }
-      }
+  // describe('quote get many', () => {
+  //   test('character id provided must be a valid id.', async () => {
+  //     const req = {
+  //       query: { character_id: 'bbleh', limit: 5 }
+  //     }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(400)
+  //         return this
+  //       },
+  //       send(result) {
+  //         expect(result.message).toBe(
+  //           `Character id ${req.query.character_id} is not valid.`
+  //         )
+  //       }
+  //     }
 
-      await getMany(req, res)
-    })
+  //     await getMany(req, res)
+  //   })
 
-    test('character name provided must be a real.', async () => {
-      const req = {
-        query: { character_name: 'fake_name' }
-      }
+  //   test('character name provided must be a real.', async () => {
+  //     const req = {
+  //       query: { character_name: 'fake_name' }
+  //     }
 
-      const res = {
-        status(status) {
-          expect(status).toBe(404)
-          return this
-        },
-        send(result) {
-          expect(typeof result.message).toBe('string')
-        }
-      }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(404)
+  //         return this
+  //       },
+  //       send(result) {
+  //         expect(typeof result.message).toBe('string')
+  //       }
+  //     }
 
-      await getMany(req, res)
-    })
+  //     await getMany(req, res)
+  //   })
 
-    test('quotes are found by character id successfully', async () => {
-      expect.assertions(2)
+  //   test('quotes are found by character id successfully', async () => {
+  //     expect.assertions(2)
 
-      const character = await Character.create({
-        name: 'Rick',
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     const character = await Character.create({
+  //       name: 'Rick',
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      const req = { query: { character_id: character._id, limit: 5 } }
-      const res = {
-        status(status) {
-          expect(status).toBe(200)
-          return this
-        },
-        json(result) {
-          expect(result.data).toHaveLength(1)
-        }
-      }
+  //     const req = { query: { character_id: character._id, limit: 5 } }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(200)
+  //         return this
+  //       },
+  //       json(result) {
+  //         expect(result.data).toHaveLength(1)
+  //       }
+  //     }
 
-      await getMany(req, res)
-    })
+  //     await getMany(req, res)
+  //   })
 
-    test('Quotes are found by character name successfully', async () => {
-      expect.assertions(2)
+  //   test('Quotes are found by character name successfully', async () => {
+  //     expect.assertions(2)
 
-      const character = await Character.create({
-        name: 'javier',
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     const character = await Character.create({
+  //       name: 'javier',
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: character._id
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: character._id
+  //     })
 
-      const req = { query: { character_name: character.name } }
-      const res = {
-        status(status) {
-          expect(status).toBe(200)
-          return this
-        },
-        json(result) {
-          const firstQuote = result.data[0]
-          expect(firstQuote.character.name).toBe(character.name)
-        }
-      }
-      await getMany(req, res)
-    })
+  //     const req = { query: { character_name: character.name } }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(200)
+  //         return this
+  //       },
+  //       json(result) {
+  //         const firstQuote = result.data[0]
+  //         expect(firstQuote.character.name).toBe(character.name)
+  //       }
+  //     }
+  //     await getMany(req, res)
+  //   })
 
-    test('quotes are found successfully', async () => {
-      expect.assertions(2)
+  //   test('quotes are found successfully', async () => {
+  //     expect.assertions(2)
 
-      const character = await Character.create({
-        name: 'Rick',
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     const character = await Character.create({
+  //       name: 'Rick',
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      const req = { query: { limit: 5 } }
-      const res = {
-        status(status) {
-          expect(status).toBe(200)
-          return this
-        },
-        json(result) {
-          expect(Array.isArray(result.data)).toBe(true)
-        }
-      }
+  //     const req = { query: { limit: 5 } }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(200)
+  //         return this
+  //       },
+  //       json(result) {
+  //         expect(Array.isArray(result.data)).toBe(true)
+  //       }
+  //     }
 
-      await getMany(req, res)
-    })
+  //     await getMany(req, res)
+  //   })
 
-    test('amount of quotes returned match limit', async () => {
-      expect.assertions(2)
+  //   test('amount of quotes returned match limit', async () => {
+  //     expect.assertions(2)
 
-      const character = await Character.create({
-        name: 'Rick',
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     const character = await Character.create({
+  //       name: 'Rick',
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      await Quote.create({
-        quote: 'Some quote.',
-        character: character._id,
-        createdBy: mongoose.Types.ObjectId()
-      })
+  //     await Quote.create({
+  //       quote: 'Some quote.',
+  //       character: character._id,
+  //       createdBy: mongoose.Types.ObjectId()
+  //     })
 
-      const req = { query: { limit: 2 } }
-      const res = {
-        status(status) {
-          expect(status).toBe(200)
-          return this
-        },
-        json(result) {
-          expect(result.data.length).toBe(2)
-        }
-      }
+  //     const req = { query: { limit: 2 } }
+  //     const res = {
+  //       status(status) {
+  //         expect(status).toBe(200)
+  //         return this
+  //       },
+  //       json(result) {
+  //         expect(result.data.length).toBe(2)
+  //       }
+  //     }
 
-      await getMany(req, res)
-    })
-    //  TODO: add support for limit query param.
-  })
+  //     await getMany(req, res)
+  //   })
+  //   //  TODO: add support for limit query param.
+  // })
 
   describe('quote update', () => {
     test('quote id param must be present', async () => {

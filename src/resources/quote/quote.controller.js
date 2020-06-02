@@ -40,29 +40,27 @@ export const getOne = async (req, res) => {
     })
   }
 
+  let query = {}
+  let characterQuery = {}
+  let character
+
+  if (req.query.character_id) {
+    query = { character: req.query.character_id }
+    characterQuery = { _id: req.query.character_id }
+  } else if (req.query.character_name) {
+    characterQuery = { name: req.query.character_name }
+  }
+
   try {
-    let query = {}
-    let characterQuery = {}
-    let character
+    character = await Character.findOne(characterQuery)
+    if (!character) {
+      const message = req.query.character_id
+        ? `Quote with character id ${req.query.character_id} does not exist.`
+        : `Quote with character name ${req.query.character_name} does not exist.`
 
-    if (req.query.character_id) {
-      query = { character: req.query.character_id }
-      characterQuery = { _id: req.query.character_id }
-    } else if (req.query.character_name) {
-      characterQuery = { name: req.query.character_name }
-    }
-
-    if (characterQuery._id || characterQuery.name) {
-      character = await Character.findOne(characterQuery)
-      if (!character) {
-        const message = req.query.character_id
-          ? `Quote with character id ${req.query.character_id} does not exist.`
-          : `Quote with character name ${req.query.character_name} does not exist.`
-
-        return res.status(404).send({ message })
-      } else {
-        query = { character: character._id }
-      }
+      return res.status(404).send({ message })
+    } else {
+      query = { character: character._id }
     }
 
     const count = await Quote.count(query)
@@ -78,60 +76,60 @@ export const getOne = async (req, res) => {
 
     return res
       .status(200)
-      .json({ data: { ...doc, character_name: character.name } })
+      .json({ data: { quote: doc.quote, character_name: character.name } })
   } catch (e) {
     console.log(e)
     return res.status(500).send({ message: e })
   }
 }
 
-export const getMany = async (req, res) => {
-  const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
-  if (req.query.character_id && !isValidId) {
-    return res.status(400).send({
-      message: `Character id ${req.query.character_id} is not valid.`
-    })
-  }
+// export const getMany = async (req, res) => {
+//   const isValidId = mongoose.Types.ObjectId.isValid(req.query.character_id)
+//   if (req.query.character_id && !isValidId) {
+//     return res.status(400).send({
+//       message: `Character id ${req.query.character_id} is not valid.`
+//     })
+//   }
 
-  try {
-    const limit = Number(req.query.limit) || 25
+//   try {
+//     const limit = Number(req.query.limit) || 25
 
-    let query = {}
-    let characterQuery = {}
-    let character
+//     let query = {}
+//     let characterQuery = {}
+//     let character
 
-    if (req.query.character_id) {
-      query = { character: req.query.character_id }
-      characterQuery = { _id: req.query.character_id }
-    } else if (req.query.character_name) {
-      characterQuery = { name: req.query.character_name }
-    }
+//     if (req.query.character_id) {
+//       query = { character: req.query.character_id }
+//       characterQuery = { _id: req.query.character_id }
+//     } else if (req.query.character_name) {
+//       characterQuery = { name: req.query.character_name }
+//     }
 
-    if (characterQuery._id || characterQuery.name) {
-      character = await Character.findOne(characterQuery)
-      if (!character) {
-        return res.status(404).send({
-          message: `Character with name or id ${req.query.character_name ||
-            req.query.character_id} was not found.`
-        })
-      } else {
-        query = { character: character._id }
-      }
-    }
+//     if (characterQuery._id || characterQuery.name) {
+//       character = await Character.findOne(characterQuery)
+//       if (!character) {
+//         return res.status(404).send({
+//           message: `Character with name or id ${req.query.character_name ||
+//             req.query.character_id} was not found.`
+//         })
+//       } else {
+//         query = { character: character._id }
+//       }
+//     }
 
-    let doc = await Quote.find(query)
-      .limit(limit)
-      .lean()
-      .exec()
-    doc = doc.map(quote => {
-      return { ...quote, character }
-    })
+//     let doc = await Quote.find(query)
+//       .limit(limit)
+//       .lean()
+//       .exec()
+//     doc = doc.map(quote => {
+//       return { ...quote, character }
+//     })
 
-    return res.status(200).json({ data: doc })
-  } catch (e) {
-    return res.status(500).send({ message: e })
-  }
-}
+//     return res.status(200).json({ data: doc })
+//   } catch (e) {
+//     return res.status(500).send({ message: e })
+//   }
+// }
 
 export const updateOne = async (req, res) => {
   if (!req.params.id) {
@@ -195,13 +193,9 @@ export const deleteOne = async (req, res) => {
 
 export default {
   createOne,
-  getMany,
   getOne,
   deleteOne
 }
 
 // TODO
-// Add middleware that filters unwanted props: since it's just one controller filter it there
-// Separate private controller from public ones by using a router for each 
-// Remove get many controller
 // Add API documentation to github
