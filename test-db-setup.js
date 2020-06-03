@@ -36,8 +36,6 @@ beforeEach(async done => {
       await clearDB()
       await Promise.all(Object.keys(models).map(name => models[name].init()))
     } catch (e) {
-      console.log('connection error')
-      console.error(e)
       throw e
     }
   } else {

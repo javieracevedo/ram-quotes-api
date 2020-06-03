@@ -65,7 +65,6 @@ export const getOne = async (req, res) => {
 
     const count = await Quote.count(query)
     const random = Math.floor(Math.random() * count)
-    console.log(query)
     let doc = await Quote.findOne(query)
       .skip(random)
       .lean()
@@ -79,7 +78,6 @@ export const getOne = async (req, res) => {
       .status(200)
       .json({ data: { quote: doc.quote, character_name: character.name } })
   } catch (e) {
-    console.log(e)
     return res.status(500).send({ message: e })
   }
 }
