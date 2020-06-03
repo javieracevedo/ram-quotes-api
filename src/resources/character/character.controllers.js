@@ -50,7 +50,7 @@ export const getMany = async (req, res) => {
   try {
     let doc = await Character.find({})
     doc = doc.map(record => {
-      return { _id: record._id, name: record.name }
+      return { id: record._id, name: record.name }
     })
     return res.status(200).json({ data: doc })
   } catch (e) {
