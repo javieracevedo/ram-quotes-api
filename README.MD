@@ -37,11 +37,14 @@ npm run test-auth
 
 ## Endpoints
 
+### Character
 
-| type          | url           | query | body   |
-| ------------- |:-------------:| -----:| :-----:|
-| col 3 is      | right-aligned | $1600 |        |
-| col 2 is      | centered      |   $12 |        |
-| zebra stripes | are neat      |    $1 |        |
+
+| type          | url                | query | body             |
+| ------------- |:------------------:| -----:| :---------------:|
+|   POST        | /characters        |       | { name: 'Rick' } |
+|   GET         | /public/characters |       |                  |
+|   DEL         | /characters/:id    |       |                  |
+|   DEL         | /characters/:id    |       |                  |
 
 - endpoints and response
