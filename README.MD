@@ -1,4 +1,4 @@
-## Rick and Morty random quotes API
+## Rick and Morty random quotes Simple API
 
 ### Introduction
 
