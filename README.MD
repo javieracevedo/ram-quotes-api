@@ -2,7 +2,7 @@
 
 ### Introduction
 
-API to get random quotes the rick and morty sitcom. This is a simple API for getting random rick and morty quotes, this isn't fully completed yet, it's my first time working with backend technology, so this is purely educational for me. Also this project was bootstraped from the repo of the frontend masters api design in node by Hendrixer.
+API to get random quotes from the rick and morty sitcom. This is a simple API for getting random rick and morty quotes, this isn't fully completed yet, it's my first time working with backend technology, so this is purely educational for me. Also this project was bootstraped from the repo of the frontend masters API design in node by Hendrixer.
 
 ### How to run
 
